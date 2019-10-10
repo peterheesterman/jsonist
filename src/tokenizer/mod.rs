@@ -17,7 +17,6 @@ pub enum Token {
     Comma(usize),
     OpenBrace(usize),
     OpenSquareBraket(usize),
-    Quote(usize),
     WhiteSpace(usize, char),
 
     // complex tokens
@@ -28,7 +27,6 @@ pub enum Token {
     StringLiteral(usize, String),
 }
 
-// TODO: write this with a fold one day
 pub fn tokenize(input: &str) -> Result<Vec<Token>, FormatterError> {
     let chars = input.chars().collect::<Vec<char>>();
     let mut indexed_characters = IndexedCharacters::new(&chars);

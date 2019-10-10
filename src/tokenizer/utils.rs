@@ -9,7 +9,6 @@ pub fn get_start_index(token: &Token) -> usize {
         CloseSquareBraket(position) => *position,
         Colon(position) => *position,
         Comma(position) => *position,
-        Quote(position) => *position,
         WhiteSpace(position, _) => *position,
 
         Null(position, _) => *position,

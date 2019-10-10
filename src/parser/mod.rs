@@ -10,7 +10,6 @@ pub struct AST {
 
 impl fmt::Display for AST {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        // TODO: write something meaningful here
         write!(f, "Something")
     }
 }

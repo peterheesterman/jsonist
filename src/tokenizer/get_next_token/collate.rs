@@ -60,6 +60,8 @@ pub fn process_string_literal(
     }
 }
 
+// TODO: Add a method to process numbers
+
 #[cfg(test)]
 mod tests {
     use super::*;

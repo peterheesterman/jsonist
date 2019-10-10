@@ -16,6 +16,7 @@ pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, Fo
         '[' => OpenSquareBraket(position),
         ']' => CloseSquareBraket(position),
         ':' => Colon(position),
+        ',' => Comma(position),
         '"' => process_string_literal(indexed_characters)?,
         'f' => {
             let token = Token::False(position, "false");
