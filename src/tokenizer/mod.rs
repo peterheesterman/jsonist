@@ -8,7 +8,7 @@ use get_next_token::get_next_token;
 pub mod indexed_characters;
 use indexed_characters::IndexedCharacters;
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq)]
 pub enum Token {
     // Singleton tokens
     CloseBrace(usize),
@@ -24,8 +24,8 @@ pub enum Token {
     Null(usize, &'static str),
     True(usize, &'static str),
     False(usize, &'static str),
-    Number(usize, &'static str),
-    StringLiteral(usize, &'static str),
+    Number(usize, String),
+    StringLiteral(usize, String),
 }
 
 // TODO: write this with a fold one day
@@ -35,7 +35,7 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, FormatterError> {
     let mut tokens: Vec<Token>  = vec![];
  
     loop {
-        if let Some(character) = indexed_characters.current_character() {
+        if let Some(_) = indexed_characters.current_character() {
             let token = get_next_token(indexed_characters)?;
             tokens.push(token);
         } else {

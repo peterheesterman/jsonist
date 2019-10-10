@@ -4,7 +4,7 @@ use super::Token;
 use super::Token::*;
 
 mod collate;
-use collate::*;
+use collate::{ process_expectation, process_string_literal };
 use super::IndexedCharacters;
 
 pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, FormatterError> {
@@ -16,21 +16,18 @@ pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, Fo
         '[' => OpenSquareBraket(position),
         ']' => CloseSquareBraket(position),
         ':' => Colon(position),
-        '"' => Quote(position), // TODO: slurp up to the next quote
+        '"' => process_string_literal(indexed_characters)?,
         'f' => {
-            let literal = "false";
-            let token = Token::False(position, literal);
-            process_expectation(&Expectation { literal, token }, indexed_characters)?
+            let token = Token::False(position, "false");
+            process_expectation("false", token, indexed_characters)?
         },
         't' => {
-            let literal = "true";
-            let token = Token::True(position, literal);
-            process_expectation(&Expectation { literal, token }, indexed_characters)?
+            let token = Token::True(position, "true");
+            process_expectation("true", token, indexed_characters)?
         },
         'n' => {
-            let literal = "null";
-            let token = Token::Null(position, literal);
-            process_expectation(&Expectation { literal, token }, indexed_characters)?
+            let token = Token::Null(position, "null");
+            process_expectation("null", token, indexed_characters)?
         },
         ' ' => WhiteSpace(position, ' '),
         '\n' => WhiteSpace(position, '\n'),
@@ -87,16 +84,22 @@ mod tests {
     }
 
     #[test]
-    fn quote() {
-        // TODO: this should slurp up a string not just 1 characteer
-        can_create_token!(Quote(0), r#"""#, "Can't create Quote");
-    }
-
-    #[test]
     fn whitespace() {
         can_create_token!(WhiteSpace(0, ' '), " ", "Can't create WhiteSpace for a space");
         can_create_token!(WhiteSpace(0, '\n'), "\n", "Can't create WhiteSpace for a newline");
         can_create_token!(WhiteSpace(0, '\t'), "\t", "Can't create WhiteSpace for a tab");
+    }
+
+    #[test]
+    fn quote() {
+        let chars = "\"test\"".chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+
+        let token = Token::StringLiteral(0, String::from("test"));
+        match get_next_token(indexed_characters) {
+            Ok(value) => assert_eq!(token, value),
+            Err(e) => panic!("{}", e)
+        }
     }
 
     #[test]
