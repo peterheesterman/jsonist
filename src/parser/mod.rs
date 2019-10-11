@@ -37,16 +37,16 @@ impl fmt::Display for AST {
 
 pub fn parse(tokens: Vec<Token>) -> Result<AST, FormatterError> {
     let tokens = remove_whitespace(tokens);
-    let node = parse_node(tokens)?;
+    let node = parse_node(tokens, 0)?;
 
     Ok(AST { root: node })
 }
 
-fn parse_node(tokens: Vec<Token>) -> Result<Node, FormatterError> {
-    if let Some(value) = tokens.get(0) {
+fn parse_node(tokens: Vec<Token>, position: usize) -> Result<Node, FormatterError> {
+    if let Some(value) = tokens.get(position) {
         match value {
-            Token::OpenBrace(_) => Ok(parse_object(tokens)?),
-            Token::OpenSquareBraket(_) => Ok(parse_array(tokens)?),
+            Token::OpenBrace(_) => Ok(parse_object(tokens, position + 1)?),
+            Token::OpenSquareBraket(_) => Ok(parse_array(tokens, position + 1)?),
             Token::True(_, _) => Ok(Node::True),
             Token::False(_, _) => Ok(Node::False),
             Token::Null(_, _) => Ok(Node::Null),
@@ -157,7 +157,9 @@ mod tests {
             whitespace7,
         ];
 
-        let ast = AST { root: Node::Array { items: vec![] } };
+        let ast = AST { root: Node::Array { items: vec![
+            Box::new(Node::False)
+        ] } };
 
         match parse(tokens) {
             Ok(result) => assert_eq!(result, ast),

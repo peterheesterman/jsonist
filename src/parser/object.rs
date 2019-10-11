@@ -3,7 +3,7 @@ use crate::tokenizer::Token;
 
 use super::Node;
 
-pub fn parse_object(tokens: Vec<Token>) -> Result<Node, FormatterError> {
+pub fn parse_object(tokens: Vec<Token>, position: usize) -> Result<Node, FormatterError> {
     let pairs = vec![];
 
     // Fill up the pairs
