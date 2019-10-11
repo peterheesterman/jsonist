@@ -25,7 +25,7 @@ pub fn get_end_index(token: &Token) -> usize {
         True(position, literal) => position + literal.len() - 1,
         False(position, literal) => position + literal.len() - 1,
         Number(position, literal) => position + literal.len() - 1,
-        StringLiteral(position, literal) => position + literal.len() - 1,
+        StringLiteral(position, literal) => position + literal.len() + 1, // Add 2 for the quotes
         _ => get_start_index(token),
     }
 }
@@ -35,7 +35,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn can_get_start_position_of_simple_token() {
+    fn start_position_of_simple_token() {
         let position = 3;
         let token = OpenBrace(position);
         assert_eq!(get_start_index(&token), position);
@@ -43,15 +43,15 @@ mod tests {
     }
 
     #[test]
-    fn can_get_end_position_of_a_complex_token() {
-        let start_position = 3;
+    fn end_position_of_a_complex_token() {
+        let start_position = 9;
         let token = StringLiteral(start_position, String::from("\"winning\""));
         assert_eq!(get_start_index(&token), start_position);
-        assert_eq!(get_end_index(&token), 11);
+        assert_eq!(get_end_index(&token), 19);
     }
 
     #[test]
-    fn can_get_end_position_of_a_complex_token_null() {
+    fn end_position_of_a_complex_token_null() {
         let start_position = 3;
         let token = Null(start_position, "null");
         assert_eq!(get_start_index(&token), start_position);
