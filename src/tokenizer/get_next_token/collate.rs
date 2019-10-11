@@ -45,9 +45,14 @@ pub fn process_string_literal(
         if let Some(&character) = indexed_characters.current_character() {
             match &character {
                 '\"' => {
-                    // TODO: check previous is not an escape
-                    return Ok(Token::StringLiteral(position, literal))
+                    let prev_character = indexed_characters.previous_character().unwrap();
+                    if *prev_character != '\\' {
+                        return Ok(Token::StringLiteral(position, literal))
+                    } else {
+                        literal.push(character)
+                    }
                 },
+                '\\' => {},
                 value @ _ => {
                     literal.push(*value)
                 }
@@ -99,6 +104,30 @@ mod tests {
         let chars = json.chars().collect::<Vec<char>>();
         let indexed_characters = IndexedCharacters::new(&chars);
         let expectation = Token::StringLiteral(0, String::from("tester"));
+        match process_string_literal(indexed_characters) {
+            Ok(result) => assert_eq!(result, expectation),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn collagte_a_string_literal_with_an_escape_in_it () {
+        let json = r#""tes\"ter""#;
+        let chars = json.chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+        let expectation = Token::StringLiteral(0, String::from("tes\"ter"));
+        match process_string_literal(indexed_characters) {
+            Ok(result) => assert_eq!(result, expectation),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn collagte_a_string_literal_with_lots_of_escaped_quotes_in_it () {
+        let json = r#""tes\"te\"   \"r""#;
+        let chars = json.chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+        let expectation = Token::StringLiteral(0, String::from("tes\"te\"   \"r"));
         match process_string_literal(indexed_characters) {
             Ok(result) => assert_eq!(result, expectation),
             Err(e) => panic!("{}", e),
