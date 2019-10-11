@@ -4,12 +4,17 @@ use FormatterError::*;
 #[derive(Debug, PartialEq)]
 pub enum FormatterError {
     ExpectedMoreCharacters(usize),
-    InvalidCharacter(usize, char),
+    InvalidTokenStartCharacter(usize, char),
     WrongCharacter {
         attempted_token_literal: &'static str,
         expected_character: char,
         wrong_character: char,
     },
+
+    // Numbers
+    InvalidNumberCharacter(usize, char),
+    ExtraDotInNumber(usize),
+    ExtraEInNumber(usize),
 }
 
 impl fmt::Display for FormatterError {
@@ -18,10 +23,26 @@ impl fmt::Display for FormatterError {
             ExpectedMoreCharacters(position) => {
                 write!(f, "Expected more tokens a position {}", position)
             }
-            InvalidCharacter(position, character) => write!(
+            InvalidTokenStartCharacter(position, character) => write!(
                 f,
                 "Character ({}) at postition ({}) is not valid.",
                 character, 
+                position
+            ),
+            InvalidNumberCharacter(position, character) => write!(
+                f,
+                "Character ({}) at postition ({}) is not valid in a number.",
+                character, 
+                position
+            ),
+            ExtraDotInNumber(position) => write!(
+                f,
+                "Found and extra dot at postition ({}) which is not valid in a number.",
+                position
+            ),
+            ExtraEInNumber(position) => write!(
+                f,
+                "Found and extra e at postition ({}) which is not valid in a number.",
                 position
             ),
             WrongCharacter {
@@ -43,7 +64,7 @@ mod tests {
 
     #[test]
     fn i_can_display_an_invalid_character_display() {
-        let invalid = InvalidCharacter(3, 'k');
+        let invalid = InvalidTokenStartCharacter(3, 'k');
 
         let description: String = format!("{}", invalid);
         assert_eq!(

@@ -7,6 +7,9 @@ mod collate;
 use collate::{ process_expectation, process_string_literal };
 use super::IndexedCharacters;
 
+mod number;
+use number::process_number_literal;
+
 pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, FormatterError> {
     let position = indexed_characters.get_index();
     let character = indexed_characters.current_character().unwrap();
@@ -34,8 +37,9 @@ pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, Fo
         '\n' => WhiteSpace(position, '\n'),
         '\t' => WhiteSpace(position, '\t'),
         // TODO: add numbers
+        &literal @ _ if literal.is_ascii_digit() => process_number_literal(indexed_characters)?,
         &literal @ _ => {
-            return Err(FormatterError::InvalidCharacter(position, literal))
+            return Err(FormatterError::InvalidTokenStartCharacter(position, literal))
         }
     };
 

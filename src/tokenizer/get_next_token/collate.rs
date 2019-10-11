@@ -8,6 +8,7 @@ enum ComplexToken {
     Null
 }
 
+#[allow(dead_code)]
 pub fn process_expectation(
     literal: &'static str,
     token: Token,
@@ -35,6 +36,7 @@ pub fn process_expectation(
     Ok(token)
 }
 
+#[allow(dead_code)]
 pub fn process_string_literal(
     indexed_characters: IndexedCharacters,
 ) -> Result<Token, FormatterError> {
@@ -65,7 +67,6 @@ pub fn process_string_literal(
     }
 }
 
-// TODO: Add a method to process numbers
 
 #[cfg(test)]
 mod tests {
