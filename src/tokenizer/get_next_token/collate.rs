@@ -42,6 +42,7 @@ pub fn process_string_literal(
 ) -> Result<Token, FormatterError> {
     let position = indexed_characters.get_index();
     let mut indexed_characters = indexed_characters.progress();
+    let mut character_position = position + 1;
     let mut literal = "".to_owned();
     loop {
         if let Some(&character) = indexed_characters.current_character() {
@@ -60,10 +61,11 @@ pub fn process_string_literal(
                 }
             }
         } else {
-            return Err(FormatterError::ExpectedMoreCharacters(243243));
+            return Err(FormatterError::ExpectedMoreCharacters(character_position));
         };
 
         indexed_characters = indexed_characters.progress();
+        character_position = character_position + 1;
     }
 }
 
@@ -131,6 +133,19 @@ mod tests {
         let expectation = Token::StringLiteral(0, String::from("tes\"te\"   \"r"));
         match process_string_literal(indexed_characters) {
             Ok(result) => assert_eq!(result, expectation),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "Expected more tokens a position 16")]
+    fn string_literal_no_end_quote () {
+        let json = r#""tes\"te\"   \"r"#;
+        let chars = json.chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+        let token = Token::Colon(0);
+        match process_string_literal(indexed_characters) {
+            Ok(result) => assert_eq!(result, token),
             Err(e) => panic!("{}", e),
         }
     }
