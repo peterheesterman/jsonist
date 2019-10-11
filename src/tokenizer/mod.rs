@@ -63,26 +63,59 @@ mod tests {
     // Arrays
     
     #[test]
-    fn tokenize_can_consume_a_string() {
-        let json = r#" { "win" : true }  "#;
+    fn tokenize_an_object() {
+        let json = r#" { "w in" : true }  "#;
 
         let whitespace = Token::WhiteSpace(0, ' ');
         let open_brace = Token::OpenBrace(1);
         let whitespace2 = Token::WhiteSpace(2, ' ');
-        let win = Token::StringLiteral(3, String::from("win"));
-        let whitespace3 = Token::WhiteSpace(8, ' ');
-        let colon = Token::Colon(9);
-        let whitespace4 = Token::WhiteSpace(10, ' ');
-        let true_token = Token::True(11, "true");
-        let whitespace5 = Token::WhiteSpace(15, ' ');
-        let close_brace = Token::CloseBrace(16);
-        let whitespace6 = Token::WhiteSpace(17, ' ');
-        let whitespace7 = Token::WhiteSpace(18, ' ');
+        let win = Token::StringLiteral(3, String::from("w in"));
+        let whitespace3 = Token::WhiteSpace(9, ' ');
+        let colon = Token::Colon(10);
+        let whitespace4 = Token::WhiteSpace(11, ' ');
+        let true_token = Token::True(12, "true");
+        let whitespace5 = Token::WhiteSpace(16, ' ');
+        let close_brace = Token::CloseBrace(17);
+        let whitespace6 = Token::WhiteSpace(18, ' ');
+        let whitespace7 = Token::WhiteSpace(19, ' ');
 
         let tokens = vec![
             whitespace, open_brace, 
                 whitespace2, win, whitespace3, colon, whitespace4, true_token, whitespace5,
             close_brace, whitespace6, whitespace7
+        ];
+
+        match tokenize(json) {
+            Ok(result) => assert_eq!(result, tokens),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn tokenize_an_array() {
+        let json = r#" [ false, 23.23, true ]  "#;
+
+        let whitespace = Token::WhiteSpace(0, ' ');
+        let open_bracket = Token::OpenSquareBraket(1);
+        let whitespace2 = Token::WhiteSpace(2, ' ');
+        let false_token = Token::False(3, "false");
+        let comma = Token::Comma(8);
+        let whitespace3 = Token::WhiteSpace(9, ' ');
+        let number = Token::Number(10, String::from("23.23"));
+        let comma2 = Token::Comma(15);
+
+        let whitespace4 = Token::WhiteSpace(16, ' ');
+
+        let true_token = Token::True(17, "true");
+        let whitespace5 = Token::WhiteSpace(21, ' ');
+        let close_bracket = Token::CloseSquareBraket(22);
+        let whitespace6 = Token::WhiteSpace(23, ' ');
+        let whitespace7 = Token::WhiteSpace(24, ' ');
+
+        let tokens = vec![
+            whitespace, open_bracket, whitespace2, 
+                false_token, comma, whitespace3, number, comma2, whitespace4, true_token, whitespace5,
+            close_bracket, whitespace6, whitespace7
         ];
 
         match tokenize(json) {
