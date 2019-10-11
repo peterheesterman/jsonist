@@ -24,6 +24,9 @@ pub enum Node {
     Null,
 }
 
+type JumpNode = (usize, Node);
+fn wrap_in_jump (node: Node) -> JumpNode { (1, node) }
+
 #[derive(Debug, PartialEq)]
 pub struct AST {
     root: Node,
@@ -37,25 +40,25 @@ impl fmt::Display for AST {
 
 pub fn parse(tokens: Vec<Token>) -> Result<AST, FormatterError> {
     let tokens = remove_whitespace(tokens);
-    let node = parse_node(tokens, 0)?;
+    let (_, node) = parse_node(&tokens, 0)?;
 
     Ok(AST { root: node })
 }
 
-fn parse_node(tokens: Vec<Token>, position: usize) -> Result<Node, FormatterError> {
+fn parse_node(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, FormatterError> {
     if let Some(value) = tokens.get(position) {
         match value {
-            Token::OpenBrace(_) => Ok(parse_object(tokens, position + 1)?),
-            Token::OpenSquareBraket(_) => Ok(parse_array(tokens, position + 1)?),
-            Token::True(_, _) => Ok(Node::True),
-            Token::False(_, _) => Ok(Node::False),
-            Token::Null(_, _) => Ok(Node::Null),
-            Token::StringLiteral(_, literal) => Ok(Node::Literal { literal: literal.to_string() }),
-            Token::Number(_, literal) => Ok(Node::Number { value:  literal.parse::<f64>().unwrap() }), // unwrap?
+            Token::OpenBrace(_) => Ok(parse_object(&tokens, position + 1)?),
+            Token::OpenSquareBraket(_) => Ok(parse_array(&tokens, position + 1)?),
+            Token::True(_, _) => Ok(wrap_in_jump(Node::True)),
+            Token::False(_, _) => Ok(wrap_in_jump(Node::False)),
+            Token::Null(_, _) => Ok(wrap_in_jump(Node::Null)),
+            Token::StringLiteral(_, literal) => Ok(wrap_in_jump(Node::Literal { literal: literal.to_string() })),
+            Token::Number(_, literal) => Ok(wrap_in_jump(Node::Number { value:  literal.parse::<f64>().unwrap() })),
             _ => return Err(FormatterError::ExpectedMoreCharacters(11111111))
         }
     } else {
-        Ok(Node::False)
+        Err(FormatterError::ExpectedMoreTokens())
     }
 }
 
@@ -158,7 +161,9 @@ mod tests {
         ];
 
         let ast = AST { root: Node::Array { items: vec![
-            Box::new(Node::False)
+            Box::new(Node::False),
+            Box::new(Node::Number { value: 23.23_f64}),
+            Box::new(Node::True)
         ] } };
 
         match parse(tokens) {

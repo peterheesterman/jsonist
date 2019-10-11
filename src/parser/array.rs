@@ -2,25 +2,30 @@ use crate::formatter::errors::FormatterError;
 use crate::tokenizer::Token;
 
 use super::Node;
+use super::JumpNode;
 use super::parse_node;
 
-pub fn parse_array(tokens: Vec<Token>, position: usize) -> Result<Node, FormatterError> {
+pub fn parse_array(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, FormatterError> {
     let mut items = vec![];
+    let mut jump = position;
 
-    if let Some(token) = tokens.get(position) {
-        println!("{:?}", token);
-        match token {
-            Token::CloseSquareBraket(_) => return Ok(Node::Array { items }),
-            _ => {
-                let node = parse_node(tokens, position)?;
-                items.push(Box::new(node))
+    loop {
+        if let Some(token) = tokens.get(jump) {
+            match token {
+                Token::CloseSquareBraket(_) => return Ok((jump, Node::Array { items })),
+                Token::Comma(_) => {
+                    jump = jump + 1;
+                },
+                _ => {
+                    let (movement, node) = parse_node(&tokens, jump)?;
+                    jump = jump + movement;
+                    items.push(Box::new(node))
+                }
             }
+        } else {
+            return Err(FormatterError::ExpectedMoreCharacters(2))
         }
-    } else {
-        return Err(FormatterError::ExpectedMoreCharacters(2))
     }
-
-    return Ok(Node::Array { items })
 }
 
 #[cfg(test)]
@@ -34,8 +39,8 @@ mod tests {
         let close_bracket = Token::CloseSquareBraket(1);
         let node = Node::Array { items: vec![] };
 
-        match parse_array(vec![ open_bracket, close_bracket ], 1) {
-            Ok(result) => assert_eq!(result, node),
+        match parse_array(&vec![ open_bracket, close_bracket ], 1) {
+            Ok((_, result)) => assert_eq!(result, node),
             Err(e) => panic!("{}", e),
         }
     }
@@ -47,8 +52,8 @@ mod tests {
         let close_bracket = Token::CloseSquareBraket(6);
         let node = Node::Array { items: vec![Box::new(Node::False)] };
 
-        match parse_array(vec![ open_bracket, false_token, close_bracket ], 1) {
-            Ok(result) => assert_eq!(result, node),
+        match parse_array(&vec![ open_bracket, false_token, close_bracket ], 1) {
+            Ok((_, result)) => assert_eq!(result, node),
             Err(e) => panic!("{}", e),
         }
     }
@@ -66,8 +71,8 @@ mod tests {
         ] };
 
         let tokens = vec![ open_bracket, false_token, comma, true_token, close_bracket ];
-        match parse_array(tokens, 1) {
-            Ok(result) => assert_eq!(result, node),
+        match parse_array(&tokens, 1) {
+            Ok((_, result)) => assert_eq!(result, node),
             Err(e) => panic!("{}", e),
         }
     }

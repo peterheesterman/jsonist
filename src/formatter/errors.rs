@@ -15,6 +15,9 @@ pub enum FormatterError {
     InvalidNumberCharacter(usize, char),
     ExtraDotInNumber(usize),
     ExtraEInNumber(usize),
+
+    // Parser
+    ExpectedMoreTokens(),
 }
 
 impl fmt::Display for FormatterError {
@@ -43,6 +46,7 @@ impl fmt::Display for FormatterError {
                 "Found and extra e at postition ({}) which is not valid in a number.",
                 position
             ),
+            ExpectedMoreTokens() => write!( f, "Ran out of tokens while parsing"),
             WrongCharacter {
                 attempted_token_literal,
                 expected_character,
