@@ -40,7 +40,6 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, FormatterError> {
             let start_index = get_start_index(&token);
             let end_index = get_end_index(&token);
                 
-            println!("{} {} {:?}", start_index, end_index, token);
             indexed_characters = indexed_characters.jump(end_index - start_index);
             tokens.push(token);
         } else {
@@ -53,15 +52,67 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, FormatterError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    // String
-    // Number
-    // Null
-    // True
-    // False
-    // Object of various types
-    // Arrays
     
+    #[test]
+    fn tokenize_string() {
+        let json = r#""w in""#;
+        let win = Token::StringLiteral(0, String::from("w in"));
+        let tokens = vec![ win ];
+
+        match tokenize(json) {
+            Ok(result) => assert_eq!(result, tokens),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn tokenize_number() {
+        let json = r#"23423.234e344"#;
+        let number = Token::Number(0, String::from("23423.234e344"));
+        let tokens = vec![ number ];
+
+        match tokenize(json) {
+            Ok(result) => assert_eq!(result, tokens),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn tokenize_null() {
+        let json = r#"null"#;
+        let null = Token::Null(0, "null");
+        let tokens = vec![ null ];
+
+        match tokenize(json) {
+            Ok(result) => assert_eq!(result, tokens),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn tokenize_true() {
+        let json = r#"true"#;
+        let true_token = Token::True(0, "true");
+        let tokens = vec![ true_token ];
+
+        match tokenize(json) {
+            Ok(result) => assert_eq!(result, tokens),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn tokenize_false() {
+        let json = r#"false"#;
+        let false_token = Token::False(0, "false");
+        let tokens = vec![ false_token ];
+
+        match tokenize(json) {
+            Ok(result) => assert_eq!(result, tokens),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
     #[test]
     fn tokenize_an_object() {
         let json = r#" { "w in" : true }  "#;
