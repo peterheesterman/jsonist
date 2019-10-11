@@ -1,12 +1,12 @@
 use crate::formatter::errors::FormatterError;
 
-pub mod utils;
-use utils::{ get_end_index, get_start_index };
+mod utils;
+use utils::{get_end_index, get_start_index};
 
 mod get_next_token;
 use get_next_token::get_next_token;
 
-pub mod indexed_characters;
+mod indexed_characters;
 use indexed_characters::IndexedCharacters;
 
 #[derive(Debug, PartialEq)]
@@ -31,15 +31,15 @@ pub enum Token {
 pub fn tokenize(input: &str) -> Result<Vec<Token>, FormatterError> {
     let chars = input.chars().collect::<Vec<char>>();
     let mut indexed_characters = IndexedCharacters::new(&chars);
-    let mut tokens: Vec<Token>  = vec![];
- 
+    let mut tokens: Vec<Token> = vec![];
+
     loop {
         if let Some(_) = indexed_characters.current_character() {
             let token = get_next_token(indexed_characters)?;
 
             let start_index = get_start_index(&token);
             let end_index = get_end_index(&token);
-                
+
             indexed_characters = indexed_characters.jump(end_index - start_index);
             tokens.push(token);
         } else {
@@ -52,12 +52,12 @@ pub fn tokenize(input: &str) -> Result<Vec<Token>, FormatterError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn tokenize_string() {
         let json = r#""w in""#;
         let win = Token::StringLiteral(0, String::from("w in"));
-        let tokens = vec![ win ];
+        let tokens = vec![win];
 
         match tokenize(json) {
             Ok(result) => assert_eq!(result, tokens),
@@ -69,7 +69,7 @@ mod tests {
     fn tokenize_number() {
         let json = r#"23423.234e344"#;
         let number = Token::Number(0, String::from("23423.234e344"));
-        let tokens = vec![ number ];
+        let tokens = vec![number];
 
         match tokenize(json) {
             Ok(result) => assert_eq!(result, tokens),
@@ -81,7 +81,7 @@ mod tests {
     fn tokenize_null() {
         let json = r#"null"#;
         let null = Token::Null(0, "null");
-        let tokens = vec![ null ];
+        let tokens = vec![null];
 
         match tokenize(json) {
             Ok(result) => assert_eq!(result, tokens),
@@ -93,7 +93,7 @@ mod tests {
     fn tokenize_true() {
         let json = r#"true"#;
         let true_token = Token::True(0, "true");
-        let tokens = vec![ true_token ];
+        let tokens = vec![true_token];
 
         match tokenize(json) {
             Ok(result) => assert_eq!(result, tokens),
@@ -105,7 +105,7 @@ mod tests {
     fn tokenize_false() {
         let json = r#"false"#;
         let false_token = Token::False(0, "false");
-        let tokens = vec![ false_token ];
+        let tokens = vec![false_token];
 
         match tokenize(json) {
             Ok(result) => assert_eq!(result, tokens),
@@ -131,9 +131,18 @@ mod tests {
         let whitespace7 = Token::WhiteSpace(19, ' ');
 
         let tokens = vec![
-            whitespace, open_brace, 
-                whitespace2, win, whitespace3, colon, whitespace4, true_token, whitespace5,
-            close_brace, whitespace6, whitespace7
+            whitespace,
+            open_brace,
+            whitespace2,
+            win,
+            whitespace3,
+            colon,
+            whitespace4,
+            true_token,
+            whitespace5,
+            close_brace,
+            whitespace6,
+            whitespace7,
         ];
 
         match tokenize(json) {
@@ -164,9 +173,20 @@ mod tests {
         let whitespace7 = Token::WhiteSpace(24, ' ');
 
         let tokens = vec![
-            whitespace, open_bracket, whitespace2, 
-                false_token, comma, whitespace3, number, comma2, whitespace4, true_token, whitespace5,
-            close_bracket, whitespace6, whitespace7
+            whitespace,
+            open_bracket,
+            whitespace2,
+            false_token,
+            comma,
+            whitespace3,
+            number,
+            comma2,
+            whitespace4,
+            true_token,
+            whitespace5,
+            close_bracket,
+            whitespace6,
+            whitespace7,
         ];
 
         match tokenize(json) {

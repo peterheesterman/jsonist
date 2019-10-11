@@ -16,7 +16,7 @@ pub fn process_number_literal(
             match &character {
                 ',' | ']' | '}' | ' ' | '\n' | '\t' => {
                     return Ok(Token::Number(token_position, literal))
-                },
+                }
                 value @ _ if value.is_ascii_digit() || *value == '.' || *value == 'e' => {
                     // dis-allow second dots?
                     if *value == '.' {
@@ -31,16 +31,19 @@ pub fn process_number_literal(
                         } else {
                             has_seen_e = true;
                         }
-                    } 
+                    }
 
                     literal.push(*value)
-                },
+                }
                 value @ _ => {
-                    return Err(FormatterError::InvalidNumberCharacter(character_position, *value));
+                    return Err(FormatterError::InvalidNumberCharacter(
+                        character_position,
+                        *value,
+                    ));
                 }
             }
         } else {
-            return Ok(Token::Number(token_position, literal))
+            return Ok(Token::Number(token_position, literal));
         };
 
         indexed_characters = indexed_characters.progress();
@@ -78,7 +81,9 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Found and extra dot at postition (3) which is not valid in a number.")]
+    #[should_panic(
+        expected = "Found and extra dot at postition (3) which is not valid in a number."
+    )]
     fn number_literal_can_not_have_two_dots() {
         let json = r#"2.3.4e3"#;
         let chars = json.chars().collect::<Vec<char>>();

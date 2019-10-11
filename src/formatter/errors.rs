@@ -26,14 +26,12 @@ impl fmt::Display for FormatterError {
             InvalidTokenStartCharacter(position, character) => write!(
                 f,
                 "Character ({}) at postition ({}) is not valid.",
-                character, 
-                position
+                character, position
             ),
             InvalidNumberCharacter(position, character) => write!(
                 f,
                 "Character ({}) at postition ({}) is not valid in a number.",
-                character, 
-                position
+                character, position
             ),
             ExtraDotInNumber(position) => write!(
                 f,

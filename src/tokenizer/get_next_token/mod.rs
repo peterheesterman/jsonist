@@ -4,8 +4,8 @@ use super::Token;
 use super::Token::*;
 
 mod collate;
-use collate::{ process_expectation, process_string_literal };
 use super::IndexedCharacters;
+use collate::{process_expectation, process_string_literal};
 
 mod number;
 use number::process_number_literal;
@@ -24,21 +24,23 @@ pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, Fo
         'f' => {
             let token = Token::False(position, "false");
             process_expectation("false", token, indexed_characters)?
-        },
+        }
         't' => {
             let token = Token::True(position, "true");
             process_expectation("true", token, indexed_characters)?
-        },
+        }
         'n' => {
             let token = Token::Null(position, "null");
             process_expectation("null", token, indexed_characters)?
-        },
+        }
         ' ' => WhiteSpace(position, ' '),
         '\n' => WhiteSpace(position, '\n'),
         '\t' => WhiteSpace(position, '\t'),
         &literal @ _ if literal.is_ascii_digit() => process_number_literal(indexed_characters)?,
         &literal @ _ => {
-            return Err(FormatterError::InvalidTokenStartCharacter(position, literal))
+            return Err(FormatterError::InvalidTokenStartCharacter(
+                position, literal,
+            ))
         }
     };
 
@@ -89,9 +91,21 @@ mod tests {
 
     #[test]
     fn whitespace() {
-        can_create_token!(WhiteSpace(0, ' '), " ", "Can't create WhiteSpace for a space");
-        can_create_token!(WhiteSpace(0, '\n'), "\n", "Can't create WhiteSpace for a newline");
-        can_create_token!(WhiteSpace(0, '\t'), "\t", "Can't create WhiteSpace for a tab");
+        can_create_token!(
+            WhiteSpace(0, ' '),
+            " ",
+            "Can't create WhiteSpace for a space"
+        );
+        can_create_token!(
+            WhiteSpace(0, '\n'),
+            "\n",
+            "Can't create WhiteSpace for a newline"
+        );
+        can_create_token!(
+            WhiteSpace(0, '\t'),
+            "\t",
+            "Can't create WhiteSpace for a tab"
+        );
     }
 
     #[test]
@@ -102,7 +116,7 @@ mod tests {
         let token = Token::StringLiteral(0, String::from("test"));
         match get_next_token(indexed_characters) {
             Ok(value) => assert_eq!(token, value),
-            Err(e) => panic!("{}", e)
+            Err(e) => panic!("{}", e),
         }
     }
 
@@ -115,7 +129,7 @@ mod tests {
         let token = Token::StringLiteral(0, String::from("test"));
         match get_next_token(indexed_characters) {
             Ok(value) => assert_eq!(token, value),
-            Err(e) => panic!("{}", e)
+            Err(e) => panic!("{}", e),
         }
     }
 }

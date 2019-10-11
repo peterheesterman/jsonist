@@ -1,7 +1,7 @@
 use std::fmt;
 
-use crate::tokenizer::Token;
 use crate::formatter::errors::FormatterError;
+use crate::tokenizer::Token;
 
 mod utils;
 use utils::remove_whitespace;
@@ -20,10 +20,10 @@ impl fmt::Display for AST {
     }
 }
 
-
 pub fn parse(tokens: Vec<Token>) -> Result<AST, FormatterError> {
     let _tokens = remove_whitespace(tokens);
 
+    // TODO: make the tokens into an AST
+
     Ok(AST { root: Node {} })
 }
-
