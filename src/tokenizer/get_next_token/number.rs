@@ -15,6 +15,7 @@ pub fn process_number_literal(
         if let Some(&character) = indexed_characters.current_character() {
             match &character {
                 ',' | ']' | '}' | ' ' | '\n' | '\t' => {
+                    // TODO: can not end with and e otherwise error
                     return Ok(Token::Number(token_position, literal))
                 }
                 value @ _ if value.is_ascii_digit() || *value == '.' || *value == 'e' => {

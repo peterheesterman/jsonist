@@ -15,7 +15,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn tokenize_an_object() {
+    fn remove_whitespace_only_leaves_important_things() {
         // let json = r#" { "w in" : true }  "#;
 
         let whitespace = Token::WhiteSpace(0, ' ');
