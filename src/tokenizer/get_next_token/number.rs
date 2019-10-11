@@ -2,7 +2,6 @@ use super::super::indexed_characters::IndexedCharacters;
 use super::super::Token;
 use crate::formatter::errors::FormatterError;
 
-#[allow(dead_code)]
 pub fn process_number_literal(
     indexed_characters: IndexedCharacters,
 ) -> Result<Token, FormatterError> {

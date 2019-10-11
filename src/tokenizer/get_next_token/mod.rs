@@ -36,7 +36,6 @@ pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, Fo
         ' ' => WhiteSpace(position, ' '),
         '\n' => WhiteSpace(position, '\n'),
         '\t' => WhiteSpace(position, '\t'),
-        // TODO: add numbers
         &literal @ _ if literal.is_ascii_digit() => process_number_literal(indexed_characters)?,
         &literal @ _ => {
             return Err(FormatterError::InvalidTokenStartCharacter(position, literal))
@@ -107,9 +106,16 @@ mod tests {
         }
     }
 
-    // #[test]
-    // fn invalid_character() {
-    //     // TODO: get an invalid token test in place
-    //     panic!("Not an invalid token");
-    // }
+    #[test]
+    #[should_panic(expected = "Character (*) at postition (0) is not valid.")]
+    fn invalid_character() {
+        let chars = "*est\"".chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+
+        let token = Token::StringLiteral(0, String::from("test"));
+        match get_next_token(indexed_characters) {
+            Ok(value) => assert_eq!(token, value),
+            Err(e) => panic!("{}", e)
+        }
+    }
 }
