@@ -2,6 +2,14 @@ use super::super::indexed_characters::IndexedCharacters;
 use super::super::Token;
 use crate::formatter::errors::FormatterError;
 
+pub fn check_end_for_e(token_position: usize, literal: String) -> Result<Token, FormatterError> {
+    if literal.len() != 0 && literal.chars().rev().next().unwrap() == 'e' {
+        Err(FormatterError::NumberLiteralEndingInE())
+    } else {
+        Ok(Token::Number(token_position, literal))
+    }
+}
+
 pub fn process_number_literal(
     indexed_characters: IndexedCharacters,
 ) -> Result<Token, FormatterError> {
@@ -15,17 +23,19 @@ pub fn process_number_literal(
         if let Some(&character) = indexed_characters.current_character() {
             match &character {
                 ',' | ']' | '}' | ' ' | '\n' | '\t' => {
-                    // TODO: can not end with and e otherwise error
-                    return Ok(Token::Number(token_position, literal))
+                    return check_end_for_e(token_position, literal)
                 }
                 value @ _ if value.is_ascii_digit() || *value == '.' || *value == 'e' => {
-                    // dis-allow second dots?
+                    
+                    // No second dots
                     if *value == '.' {
                         if has_seen_dot {
                             return Err(FormatterError::ExtraDotInNumber(character_position));
                         } else {
                             has_seen_dot = true;
                         }
+
+                    // No second e
                     } else if *value == 'e' {
                         if has_seen_e {
                             return Err(FormatterError::ExtraEInNumber(character_position));
@@ -44,7 +54,7 @@ pub fn process_number_literal(
                 }
             }
         } else {
-            return Ok(Token::Number(token_position, literal));
+            return check_end_for_e(token_position, literal)
         };
 
         indexed_characters = indexed_characters.progress();
@@ -100,6 +110,19 @@ mod tests {
     #[should_panic(expected = "Found and extra e at postition (5) which is not valid in a number.")]
     fn number_literal_can_not_have_two_exponentials() {
         let json = r#"2.3e4e3"#;
+        let chars = json.chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+        let expectation = Token::Number(0, String::from(""));
+        match process_number_literal(indexed_characters) {
+            Ok(result) => assert_eq!(result, expectation),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "A number literal can not end with an 'e' character")]
+    fn number_literal_can_not_end_with_an_e() {
+        let json = r#"2.3e"#;
         let chars = json.chars().collect::<Vec<char>>();
         let indexed_characters = IndexedCharacters::new(&chars);
         let expectation = Token::Number(0, String::from(""));

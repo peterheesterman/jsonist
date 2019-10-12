@@ -15,6 +15,7 @@ pub enum FormatterError {
     InvalidNumberCharacter(usize, char),
     ExtraDotInNumber(usize),
     ExtraEInNumber(usize),
+    NumberLiteralEndingInE(),
 
     // Parser
     ExpectedMoreTokens(),
@@ -45,6 +46,10 @@ impl fmt::Display for FormatterError {
                 f,
                 "Found and extra e at postition ({}) which is not valid in a number.",
                 position
+            ),
+            NumberLiteralEndingInE() => write!(
+                f,
+                "A number literal can not end with an 'e' character"
             ),
             ExpectedMoreTokens() => write!( f, "Ran out of tokens while parsing"),
             WrongCharacter {
