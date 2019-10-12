@@ -16,7 +16,6 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
 
     loop {
         if let Some(token) = tokens.get(jump) {
-                println!("{:?}", token);
             match token {
                 Token::CloseBrace(_) => return Ok((jump, Node::Object { pairs })),
                 Token::Comma(_) => {
