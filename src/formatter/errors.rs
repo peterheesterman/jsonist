@@ -21,7 +21,7 @@ pub enum FormatterError {
     ExpectedMoreTokens(),
     ExpectedColonInKeyValuePair(),
     ExpectedStringLiteral(usize),
-    DuplicateKeyEntry()
+    DuplicateKeyEntry(String)
 }
 
 impl fmt::Display for FormatterError {
@@ -67,7 +67,7 @@ impl fmt::Display for FormatterError {
             ),
 
             // Parser
-            ExpectedMoreTokens() => write!( f, "Ran out of tokens while parsing"),
+            ExpectedMoreTokens() => write!( f, "Ran out of tokens while parsing."),
             ExpectedColonInKeyValuePair() => write!( f, "Key value pairs must be delimited by colons (:)."),
             ExpectedStringLiteral(position) => write!(
                 f,
@@ -75,7 +75,7 @@ impl fmt::Display for FormatterError {
                 position
             ),
             // TODO: add what the literal string was to the error
-            DuplicateKeyEntry() => write!( f, "Duplicate key entry"),
+            DuplicateKeyEntry(literal) => write!( f, "Duplicate key ('{}') entry.", literal),
         }
     }
 }

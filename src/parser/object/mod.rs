@@ -43,7 +43,7 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                     if let Node::Literal { literal } = &key {
                         println!("{}", literal);
                         if keys.contains(literal) {
-                            return Err(FormatterError::DuplicateKeyEntry())
+                            return Err(FormatterError::DuplicateKeyEntry(literal.to_string()))
                         }
                         keys.push(literal.to_string()) 
                     }
@@ -212,7 +212,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Duplicate key entry")]
+    #[should_panic(expected = "Duplicate key ('w in') entry.")]
     fn parse_object_with_duplicate_keys_should_fail() {
         let open_brace = Token::OpenBrace(1);
         let win = Token::StringLiteral(3, String::from("w in"));
