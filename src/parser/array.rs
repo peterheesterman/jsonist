@@ -30,7 +30,6 @@ pub fn parse_array(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, For
 
 #[cfg(test)]
 mod tests {
-    use super::super::AST;
     use super::*;
 
     #[test]

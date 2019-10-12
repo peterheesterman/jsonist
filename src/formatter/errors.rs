@@ -19,19 +19,32 @@ pub enum FormatterError {
 
     // Parser
     ExpectedMoreTokens(),
+    ExpectedColonInKeyValuePair(),
+    ExpectedStringLiteral(usize)
 }
 
 impl fmt::Display for FormatterError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match &self {
             ExpectedMoreCharacters(position) => {
-                write!(f, "Expected more tokens a position {}", position)
+                write!(f, "Expected more tokens a position {}.", position)
             }
             InvalidTokenStartCharacter(position, character) => write!(
                 f,
                 "Character ({}) at postition ({}) is not valid.",
                 character, position
             ),
+            WrongCharacter {
+                attempted_token_literal,
+                expected_character,
+                wrong_character,
+            } => write!(
+                f,
+                "Wrong Character: found ({}) when expecting ({}) while trying to build token {}.",
+                wrong_character, expected_character, attempted_token_literal
+            ),
+
+            // Number 
             InvalidNumberCharacter(position, character) => write!(
                 f,
                 "Character ({}) at postition ({}) is not valid in a number.",
@@ -49,17 +62,16 @@ impl fmt::Display for FormatterError {
             ),
             NumberLiteralEndingInE() => write!(
                 f,
-                "A number literal can not end with an 'e' character"
+                "A number literal can not end with an 'e' character."
             ),
+
+            // Parser
             ExpectedMoreTokens() => write!( f, "Ran out of tokens while parsing"),
-            WrongCharacter {
-                attempted_token_literal,
-                expected_character,
-                wrong_character,
-            } => write!(
+            ExpectedColonInKeyValuePair() => write!( f, "Key value pairs must be delimited by colons (:)."),
+            ExpectedStringLiteral(position) => write!(
                 f,
-                "Wrong Character: found ({}) when expecting ({}) while trying to build token {}",
-                wrong_character, expected_character, attempted_token_literal
+                "Expected string literal at position ({}).",
+                position
             ),
         }
     }

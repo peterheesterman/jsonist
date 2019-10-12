@@ -1,3 +1,4 @@
+
 use crate::formatter::errors::FormatterError;
 use crate::tokenizer::Token;
 
@@ -5,7 +6,11 @@ use super::Node;
 use super::JumpNode;
 use super::parse_node;
 
+mod literal;
+use literal::parse_literal;
+
 pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, FormatterError> {
+    let keys: Vec<String> = vec![];
     let mut pairs = vec![];
     let mut jump = position;
 
@@ -18,14 +23,23 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                     jump = jump + 1;
                 },
                 _ => {
-                    let (movement, key) = parse_node(&tokens, jump)?;
-                    jump = jump + movement + 1;
+                    let (movement, key) = parse_literal(&tokens, jump)?;
+                    jump = jump + movement;
 
-                    // TODO: check for a colon
+                    // Ensure there is a colon
+                    if let Some(token) = tokens.get(jump) {
+                        match token {
+                            Token::Colon(_) => {
+                                jump = jump + 1;
+                            },
+                            _ => return Err(FormatterError::ExpectedColonInKeyValuePair())
+                        }
+                    }
+
                     let (movement, value) = parse_node(&tokens, jump)?;
                     jump = jump + movement;
 
-                    // TODO: check for duplicate key entry in object
+                    // Check for duplicate keys
                     pairs.push(Box::new(Node::Pair { key: Box::new(key), value: Box::new(value) }))
                 }
             }
@@ -65,6 +79,70 @@ mod tests {
         let tokens = vec![
             open_brace,
             win,
+            colon,
+            true_token,
+            close_brace,
+        ];
+
+        let node = Node::Object { pairs: vec![
+            Box::new(Node::Pair {
+                key: Box::new(Node::Literal { literal: String::from("w in") }),
+                value: Box::new(Node::True)
+            })
+        ]};
+
+        match parse_object(&tokens, 1) {
+            Ok((_, result)) => assert_eq!(result, node),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "Key value pairs must be delimited by colons (:).")]
+    fn parse_object_one_pair_no_colon() {
+        // let json = r#" { "w in" } true }  "#;
+
+        let open_brace = Token::OpenBrace(1);
+        let win = Token::StringLiteral(3, String::from("w in"));
+        let bad_char = Token::CloseBrace(10);
+        let true_token = Token::True(12, "true");
+        let close_brace = Token::CloseBrace(17);
+
+        let tokens = vec![
+            open_brace,
+            win,
+            bad_char,
+            true_token,
+            close_brace,
+        ];
+
+        let node = Node::Object { pairs: vec![
+            Box::new(Node::Pair {
+                key: Box::new(Node::Literal { literal: String::from("w in") }),
+                value: Box::new(Node::True)
+            })
+        ]};
+
+        match parse_object(&tokens, 1) {
+            Ok((_, result)) => assert_eq!(result, node),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "Expected string literal at position (1).")]
+    fn parse_object_key_must_be_a_literal() {
+        // let json = r#" { false : true }  "#;
+
+        let open_brace = Token::OpenBrace(1);
+        let false_token = Token::False(12, "false");
+        let colon = Token::Colon(10);
+        let true_token = Token::True(12, "true");
+        let close_brace = Token::CloseBrace(17);
+
+        let tokens = vec![
+            open_brace,
+            false_token,
             colon,
             true_token,
             close_brace,
