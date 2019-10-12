@@ -20,7 +20,8 @@ pub enum FormatterError {
     // Parser
     ExpectedMoreTokens(),
     ExpectedColonInKeyValuePair(),
-    ExpectedStringLiteral(usize)
+    ExpectedStringLiteral(usize),
+    DuplicateKeyEntry()
 }
 
 impl fmt::Display for FormatterError {
@@ -73,6 +74,8 @@ impl fmt::Display for FormatterError {
                 "Expected string literal at position ({}).",
                 position
             ),
+            // TODO: add what the literal string was to the error
+            DuplicateKeyEntry() => write!( f, "Duplicate key entry"),
         }
     }
 }

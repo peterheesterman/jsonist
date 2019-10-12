@@ -10,7 +10,7 @@ mod literal;
 use literal::parse_literal;
 
 pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, FormatterError> {
-    let keys: Vec<String> = vec![];
+    let mut keys: Vec<String> = vec![];
     let mut pairs = vec![];
     let mut jump = position;
 
@@ -40,6 +40,15 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                     jump = jump + movement;
 
                     // Check for duplicate keys
+                    if let Node::Literal { literal } = &key {
+                        println!("{}", literal);
+                        if keys.contains(literal) {
+                            return Err(FormatterError::DuplicateKeyEntry())
+                        }
+                        keys.push(literal.to_string()) 
+                    }
+
+
                     pairs.push(Box::new(Node::Pair { key: Box::new(key), value: Box::new(value) }))
                 }
             }
@@ -203,7 +212,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "duplicate key")]
+    #[should_panic(expected = "Duplicate key entry")]
     fn parse_object_with_duplicate_keys_should_fail() {
         let open_brace = Token::OpenBrace(1);
         let win = Token::StringLiteral(3, String::from("w in"));
