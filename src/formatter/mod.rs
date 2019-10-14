@@ -11,24 +11,24 @@ pub fn format(ast: AST) -> String {
 fn print_node(node: Node) -> String {
     // TODO: deal with passing a depth into function
     match node {
-        //TODO: implement and test object nodes
-        // Node::Object { pairs } => 
+        Node::Object { pairs } => format!(
+            "{}\n    {}\n{}", 
+            "{",
+            pairs.into_iter().map(|ref item| print_node((**item).clone())).collect::<Vec::<String>>().join(",\n    "),
+            "}\n"
+        ),
         Node::Array { items } => format!(
-            "[\n\t{}\n]", 
-            items.into_iter().map(|ref item| print_node((**item).clone())).collect::<Vec::<String>>().join(",\n\t")
+            "[\n    {}\n]", 
+            items.into_iter().map(|ref item| print_node((**item).clone())).collect::<Vec::<String>>().join(",\n    ")
         ),
         Node::Pair { key, value } => format!("{}: {}", print_node(*key), print_node(*value)),
-        Node::Literal { literal } => format!("{}", literal),
+        Node::Literal { literal } => format!("\"{}\"", literal),
         Node::Number { value } => format!("{}", value),
         Node::True => String::from("true"),
         Node::False => String::from("false"),
         Node::Null => String::from("null"),
-        _ => panic!("failed")
     }
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
@@ -68,7 +68,7 @@ mod tests {
 
     #[test]
     fn print_node_literal() {
-        let node = Node::Literal { literal: r#""key""#.to_owned() };
+        let node = Node::Literal { literal: "key".to_owned() };
         let expected_string = r#""key""#;
             
         assert_eq!(print_node(node), expected_string)
@@ -76,7 +76,7 @@ mod tests {
 
     #[test]
     fn print_node_pair() {
-        let key = Node::Literal { literal: r#""key""#.to_owned() };
+        let key = Node::Literal { literal: "key".to_owned() };
         let r#true = Node::True;
 
         let pair = Node::Pair {
@@ -84,14 +84,13 @@ mod tests {
             value: Box::new(r#true)
         };
 
-        let expected_string = r#""key": true"#;
+        let expected_string = "\"key\": true";
             
         assert_eq!(print_node(pair), expected_string)
     }
 
     #[test]
     fn print_node_array() {
-        let key = Node::Literal { literal: r#""key""#.to_owned() };
         let r#true = Node::True;
         let r#true2 = Node::True;
 
@@ -103,10 +102,34 @@ mod tests {
         };
 
         let expected_string = "[
-\ttrue,
-\ttrue
+    true,
+    true
 ]";
             
         assert_eq!(print_node(array), expected_string)
+    }
+
+    #[test]
+    fn print_node_object() {
+        let key = Node::Literal { literal: "key".to_owned() };
+        let r#true = Node::True;
+
+        let pair = Node::Pair {
+            key: Box::new(key),
+            value: Box::new(r#true)
+        };
+        
+        let object = Node::Object {
+            pairs: vec![
+                Box::new(pair)
+            ]
+        };
+
+        let expected_string = r#"{
+    "key": true
+}
+"#;
+            
+        assert_eq!(print_node(object), expected_string)
     }
 }

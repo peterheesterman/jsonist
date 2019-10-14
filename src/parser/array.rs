@@ -11,19 +11,25 @@ pub fn parse_array(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, For
 
     loop {
         if let Some(token) = tokens.get(jump) {
+            println!("parse_array - {:?} jump: {}", token, jump);
             match token {
-                Token::CloseSquareBraket(_) => return Ok((jump, Node::Array { items })),
+                Token::CloseSquareBraket(_) => {
+                    let movement_from_braces = 2;
+                    let net_movement = (jump - position) + movement_from_braces;
+                    return Ok((net_movement, Node::Array { items }))
+                },
                 Token::Comma(_) => {
                     jump = jump + 1;
                 },
                 _ => {
                     let (movement, node) = parse_node(&tokens, jump)?;
+                    println!("jump: {}, movement: {}", jump, movement);
                     jump = jump + movement;
                     items.push(Box::new(node))
                 }
             }
         } else {
-            return Err(FormatterError::ExpectedMoreCharacters(2))
+            return Err(FormatterError::ExpectedMoreCharacters(6666666))
         }
     }
 }

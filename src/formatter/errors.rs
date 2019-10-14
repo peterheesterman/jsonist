@@ -74,7 +74,6 @@ impl fmt::Display for FormatterError {
                 "Expected string literal at position ({}).",
                 position
             ),
-            // TODO: add what the literal string was to the error
             DuplicateKeyEntry(literal) => write!( f, "Duplicate key ('{}') entry.", literal),
         }
     }

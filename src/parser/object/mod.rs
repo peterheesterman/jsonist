@@ -14,8 +14,10 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
     let mut pairs = vec![];
     let mut jump = position;
 
+            println!("tokens.len {}", tokens.len());
     loop {
         if let Some(token) = tokens.get(jump) {
+            println!("parse_object - {:?}", token);
             match token {
                 Token::CloseBrace(_) => return Ok((jump, Node::Object { pairs })),
                 Token::Comma(_) => {
@@ -23,6 +25,7 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                 },
                 _ => {
                     let (movement, key) = parse_literal(&tokens, jump)?;
+                    println!("parse_object - key: {:?}", key);
                     jump = jump + movement;
 
                     // Ensure there is a colon
@@ -36,11 +39,12 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                     }
 
                     let (movement, value) = parse_node(&tokens, jump)?;
+                    println!("parse_object - jump: {:?}, movement:  {}", jump, movement);
                     jump = jump + movement;
+                    println!("parse_object - value: {:?}", value);
 
                     // Check for duplicate keys
                     if let Node::Literal { literal } = &key {
-                        println!("{}", literal);
                         if keys.contains(literal) {
                             return Err(FormatterError::DuplicateKeyEntry(literal.to_string()))
                         }
@@ -52,7 +56,7 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                 }
             }
         } else {
-            return Err(FormatterError::ExpectedMoreCharacters(2))
+            return Err(FormatterError::ExpectedMoreCharacters(99999999))
         }
     }
 }

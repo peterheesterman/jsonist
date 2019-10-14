@@ -1,0 +1,10 @@
+{
+    "name": "Peter",
+    "leg_count": 2,
+    "languages": [
+    "rust",
+    "javascript",
+    "lisp"
+],
+    "winner": true
+}
