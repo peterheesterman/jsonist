@@ -14,18 +14,19 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
     let mut pairs = vec![];
     let mut jump = position;
 
-            println!("tokens.len {}", tokens.len());
     loop {
         if let Some(token) = tokens.get(jump) {
-            println!("parse_object - {:?}", token);
             match token {
-                Token::CloseBrace(_) => return Ok((jump, Node::Object { pairs })),
+                Token::CloseBrace(_) => {
+                    let movement_from_braces = 2;
+                    let net_movement = (jump - position) + movement_from_braces;
+                    return Ok((net_movement, Node::Object { pairs }))
+                },
                 Token::Comma(_) => {
                     jump = jump + 1;
                 },
                 _ => {
                     let (movement, key) = parse_literal(&tokens, jump)?;
-                    println!("parse_object - key: {:?}", key);
                     jump = jump + movement;
 
                     // Ensure there is a colon
@@ -39,9 +40,7 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                     }
 
                     let (movement, value) = parse_node(&tokens, jump)?;
-                    println!("parse_object - jump: {:?}, movement:  {}", jump, movement);
                     jump = jump + movement;
-                    println!("parse_object - value: {:?}", value);
 
                     // Check for duplicate keys
                     if let Node::Literal { literal } = &key {

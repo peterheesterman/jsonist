@@ -11,7 +11,6 @@ pub fn parse_array(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, For
 
     loop {
         if let Some(token) = tokens.get(jump) {
-            println!("parse_array - {:?} jump: {}", token, jump);
             match token {
                 Token::CloseSquareBraket(_) => {
                     let movement_from_braces = 2;
@@ -23,7 +22,6 @@ pub fn parse_array(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, For
                 },
                 _ => {
                     let (movement, node) = parse_node(&tokens, jump)?;
-                    println!("jump: {}, movement: {}", jump, movement);
                     jump = jump + movement;
                     items.push(Box::new(node))
                 }

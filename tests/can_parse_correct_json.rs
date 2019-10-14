@@ -6,12 +6,16 @@ use jsonist::lint;
 
 #[test]
 fn integration_test() {
-    // TODO: make this meaningful with and input and an output file
+    // TODO: depth and comma placement still need addressing in the output of this test
     let json = r#"
         {
             "name": "Peter",
             "leg_count": 2,
             "languages": ["rust", "javascript", "lisp"],
+            "address": {
+                "street_name": "lets not put this online",
+                "city": "a large one"
+            },
             "winner": true
         }
     "#.to_owned();

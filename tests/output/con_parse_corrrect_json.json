@@ -6,5 +6,10 @@
     "javascript",
     "lisp"
 ],
+    "address": {
+    "street_name": "lets not put this online",
+    "city": "a large one"
+}
+,
     "winner": true
 }
