@@ -5,23 +5,49 @@ pub mod errors;
 
 pub fn format(ast: AST) -> String {
     let AST { root } = ast;
-    print_node(root)
+    print_node(root, 0)
 }
 
-fn print_node(node: Node) -> String {
+fn print_node(node: Node, depth: usize) -> String {
     // TODO: deal with passing a depth into function
     match node {
-        Node::Object { pairs } => format!(
-            "{}\n    {}\n{}", 
-            "{",
-            pairs.into_iter().map(|ref item| print_node((**item).clone())).collect::<Vec::<String>>().join(",\n    "),
-            "}\n"
-        ),
-        Node::Array { items } => format!(
-            "[\n    {}\n]", 
-            items.into_iter().map(|ref item| print_node((**item).clone())).collect::<Vec::<String>>().join(",\n    ")
-        ),
-        Node::Pair { key, value } => format!("{}: {}", print_node(*key), print_node(*value)),
+        Node::Object { pairs } => 
+        {
+            let depth = depth + 1;
+            println!("object {}", depth);
+            let padding = " ".repeat(4 * depth);
+            let dedent = " ".repeat(4 * (depth - 1));
+            let joiner = format!("{}{}", ",\n", padding);
+            let end_object = if depth == 1 { 
+
+                println!("happens? {}", depth);
+                format!("{}{}\n", dedent, "}")
+            } else {
+                format!("{}{}", dedent, "}")
+            };
+
+            format!(
+                "{}\n{}{}\n{}", 
+                "{",
+                padding,
+                pairs.into_iter().map(|ref item| print_node((**item).clone(), depth)).collect::<Vec::<String>>().join(&joiner),
+                &end_object
+            )
+        },
+        Node::Array { items } => {
+            let depth = depth + 1;
+            println!("array {}", depth);
+            let padding = " ".repeat(4 * depth);
+            let dedent = " ".repeat(4 * (depth - 1));
+            let joiner = format!("{}{}", ",\n", padding);
+            format!(
+                "[\n{}{}\n{}]", 
+                padding,
+                items.into_iter().map(|ref item| print_node((**item).clone(), depth)).collect::<Vec::<String>>().join(&joiner),
+                dedent
+            )
+        },
+        Node::Pair { key, value } => format!("{}: {}", print_node(*key, depth), print_node(*value, depth)),
         Node::Literal { literal } => format!("\"{}\"", literal),
         Node::Number { value } => format!("{}", value),
         Node::True => String::from("true"),
@@ -39,7 +65,7 @@ mod tests {
         let node = Node::True;
         let expected_string = "true";
             
-        assert_eq!(print_node(node), expected_string)
+        assert_eq!(print_node(node, 0), expected_string)
     }
 
     #[test]
@@ -47,7 +73,7 @@ mod tests {
         let node = Node::False;
         let expected_string = "false";
             
-        assert_eq!(print_node(node), expected_string)
+        assert_eq!(print_node(node, 0), expected_string)
     }
 
     #[test]
@@ -55,7 +81,7 @@ mod tests {
         let node = Node::Null;
         let expected_string = "null";
             
-        assert_eq!(print_node(node), expected_string)
+        assert_eq!(print_node(node, 0), expected_string)
     }
 
     #[test]
@@ -63,7 +89,7 @@ mod tests {
         let node = Node::Number { value: 3.141592 };
         let expected_string = "3.141592";
             
-        assert_eq!(print_node(node), expected_string)
+        assert_eq!(print_node(node, 0), expected_string)
     }
 
     #[test]
@@ -71,7 +97,7 @@ mod tests {
         let node = Node::Literal { literal: "key".to_owned() };
         let expected_string = r#""key""#;
             
-        assert_eq!(print_node(node), expected_string)
+        assert_eq!(print_node(node, 0), expected_string)
     }
 
     #[test]
@@ -86,7 +112,7 @@ mod tests {
 
         let expected_string = "\"key\": true";
             
-        assert_eq!(print_node(pair), expected_string)
+        assert_eq!(print_node(pair, 0), expected_string)
     }
 
     #[test]
@@ -106,7 +132,7 @@ mod tests {
     true
 ]";
             
-        assert_eq!(print_node(array), expected_string)
+        assert_eq!(print_node(array, 0), expected_string)
     }
 
     #[test]
@@ -130,6 +156,6 @@ mod tests {
 }
 "#;
             
-        assert_eq!(print_node(object), expected_string)
+        assert_eq!(print_node(object, 0), expected_string)
     }
 }

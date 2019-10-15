@@ -2,14 +2,13 @@
     "name": "Peter",
     "leg_count": 2,
     "languages": [
-    "rust",
-    "javascript",
-    "lisp"
-],
+        "rust",
+        "javascript",
+        "lisp"
+    ],
     "address": {
-    "street_name": "lets not put this online",
-    "city": "a large one"
-}
-,
+        "street_name": "lets not put this online",
+        "city": "a large one"
+    },
     "winner": true
 }

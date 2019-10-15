@@ -21,6 +21,7 @@ fn integration_test() {
     "#.to_owned();
 
     let expected_out_file_path = "./tests/output/con_parse_corrrect_json.json";
+
     let expected_contents = fs::read_to_string(expected_out_file_path).expect("No output file");
 
     match lint(json) {
