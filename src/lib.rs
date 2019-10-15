@@ -2,32 +2,16 @@ mod tokenizer;
 
 mod parser;
 
-mod formatter;
+pub mod formatter;
 use formatter::errors::{ FormatterError };
+pub use formatter::{ FormatConfig, Delimiter, DelimiterCount };
 
-pub fn lint(input: String) -> Result<String, FormatterError> {
+pub fn lint(input: String, config: Option<FormatConfig>) -> Result<String, FormatterError> {
     let tokens = tokenizer::tokenize(input.as_str())?;
     let ast = parser::parse(tokens)?;
-    Ok(formatter::format(ast))
+    match config {
+        None => Ok(formatter::format(ast)),
+        Some(config) => Ok(formatter::format_with_config(ast, &config)),
+    }
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // TODO: re-instate this test
-    // #[test]
-    // fn lint_simple_object() {
-    //     let json = r#" 
-    //         { 
-    //           "key": true
-    //         }
-    //         "#.to_owned();
-
-    //     let expected_result = "A formatted AST".to_owned();
-    //     match lint(json) {
-    //         Ok(result) => assert_eq!(result, expected_result),
-    //         Err(e) => panic!("{}", e),
-    //     }
-    // }
-}

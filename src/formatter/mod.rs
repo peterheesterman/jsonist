@@ -18,6 +18,12 @@ pub enum DelimiterCount { Four, Two }
 pub enum Delimiter { Spaces(DelimiterCount), Tabs }
 pub struct FormatConfig { delimiter: Delimiter }
 
+impl FormatConfig {
+    pub fn new(delimiter: Delimiter) -> FormatConfig {
+        FormatConfig { delimiter }
+    }
+}
+
 fn derive(depth: usize, config: &FormatConfig) -> (String, String) {
     match &config.delimiter {
         Delimiter::Spaces(count) => {

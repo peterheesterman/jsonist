@@ -2,7 +2,7 @@ extern crate jsonist;
 
 use std::fs;
 
-use jsonist::lint;
+use jsonist:: { lint, FormatConfig, Delimiter, DelimiterCount };
 
 #[test]
 fn integration_test_max_depth_one() {
@@ -24,16 +24,14 @@ fn integration_test_max_depth_one() {
 
     let expected_contents = fs::read_to_string(expected_out_file_path).expect("No output file");
 
-    match lint(json) {
+    match lint(json, None) {
         Ok(value) => assert_eq!(value, expected_contents),
         Err(e) => panic!("{}", e)
     }
 }
 
-#[test]
-fn integration_test_more_depth() {
-    // TODO: depth and comma placement still need addressing in the output of this test
-    let json = r#"
+fn complex_json() -> String {
+    r#"
 {
 	"destination_addresses": [
 		"Washington, DC, USA",
@@ -79,14 +77,49 @@ fn integration_test_more_depth() {
 	}],
 	"status": "OK"
 }
-    "#.to_owned();
+    "#.to_owned()
+}
 
-    let expected_out_file_path = "./tests/output/con_parse_complex_json.json";
+#[test]
+fn integration_test_more_depth() {
+    let json = complex_json();
 
+    let expected_out_file_path = "./tests/output/con_parse_complex_json_four_spaces.json";
     let expected_contents = fs::read_to_string(expected_out_file_path).expect("No output file");
 
-    match lint(json) {
+    match lint(json, None) {
         Ok(value) => assert_eq!(value, expected_contents),
         Err(e) => panic!("{}", e)
     }
 }
+
+#[test]
+fn integration_test_more_depth_two_spaces() {
+    let json = complex_json();
+
+    let expected_out_file_path = "./tests/output/con_parse_complex_json_two_spaces.json";
+    let expected_contents = fs::read_to_string(expected_out_file_path).expect("No output file");
+
+    let config = FormatConfig::new(Delimiter::Spaces(DelimiterCount::Two));
+
+    match lint(json, Some(config)) {
+        Ok(value) => assert_eq!(value, expected_contents),
+        Err(e) => panic!("{}", e)
+    }
+}
+
+#[test]
+fn integration_test_more_depth_tabs() {
+    let json = complex_json();
+
+    let expected_out_file_path = "./tests/output/con_parse_complex_json_tabs.json";
+    let expected_contents = fs::read_to_string(expected_out_file_path).expect("No output file");
+
+    let config = FormatConfig::new(Delimiter::Tabs);
+
+    match lint(json, Some(config)) {
+        Ok(value) => assert_eq!(value, expected_contents),
+        Err(e) => panic!("{}", e)
+    }
+}
+
