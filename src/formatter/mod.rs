@@ -3,17 +3,6 @@ use super::parser::Node;
 
 pub mod errors;
 
-pub fn format(ast: AST) -> String {
-    let AST { root } = ast;
-    let config = FormatConfig { delimiter: Delimiter::Spaces(DelimiterCount::Four) };
-    print_node(root, 0, &config)
-}
-
-pub fn format_with_config(ast: AST, config: &FormatConfig) -> String {
-    let AST { root } = ast;
-    print_node(root, 0, config)
-}
-
 pub enum DelimiterCount { Four, Two }
 pub enum Delimiter { Spaces(DelimiterCount), Tabs }
 pub struct FormatConfig { delimiter: Delimiter }
@@ -22,6 +11,17 @@ impl FormatConfig {
     pub fn new(delimiter: Delimiter) -> FormatConfig {
         FormatConfig { delimiter }
     }
+}
+
+pub(crate) fn stringify(ast: AST) -> String {
+    let AST { root } = ast;
+    let config = FormatConfig { delimiter: Delimiter::Spaces(DelimiterCount::Four) };
+    print_node(root, 0, &config)
+}
+
+pub(crate) fn stringify_with_config(ast: AST, config: &FormatConfig) -> String {
+    let AST { root } = ast;
+    print_node(root, 0, config)
 }
 
 fn derive(depth: usize, config: &FormatConfig) -> (String, String) {

@@ -3,6 +3,7 @@ use FormatterError::*;
 
 #[derive(Debug, PartialEq)]
 pub enum FormatterError {
+    // Tokeniser
     ExpectedMoreCharacters(usize),
     InvalidTokenStartCharacter(usize, char),
     WrongCharacter {
