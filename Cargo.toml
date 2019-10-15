@@ -7,7 +7,7 @@ edition = "2018"
 description = "A JSON formatter"
 #repository = "https://github.com/peterheesterman/jsonist"
 #readme = "./README.md"
-keywords = ["json", "format", "simple", "fast", "formatter", "AST"]
+keywords = ["json", "format", "simple", "fast", "formatter"]
 categories = ["encoding", "parsing"]
 license = "MIT"
 
