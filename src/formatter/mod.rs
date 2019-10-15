@@ -3,10 +3,6 @@ use super::parser::Node;
 
 pub mod errors;
 
-pub enum DelimiterCount { Two, Four }
-pub enum Delimiter { Spaces(DelimiterCount), Tabs }
-pub struct FormatConfig { delimiter: Delimiter }
-
 pub fn format(ast: AST) -> String {
     let AST { root } = ast;
     let config = FormatConfig { delimiter: Delimiter::Spaces(DelimiterCount::Four) };
@@ -18,36 +14,43 @@ pub fn format_with_config(ast: AST, config: &FormatConfig) -> String {
     print_node(root, 0, config)
 }
 
+pub enum DelimiterCount { Four, Two }
+pub enum Delimiter { Spaces(DelimiterCount), Tabs }
+pub struct FormatConfig { delimiter: Delimiter }
+
+fn derive(depth: usize, config: &FormatConfig) -> (String, String) {
+    match &config.delimiter {
+        Delimiter::Spaces(count) => {
+            let number = match count {
+                DelimiterCount::Two => 2,
+                DelimiterCount::Four => 4,
+            };
+            (" ".repeat(number * depth), " ".repeat(number * (depth - 1)))
+        },
+        Delimiter::Tabs => ("\t".repeat(depth), "\t".repeat(depth - 1))
+    }
+}
+
 fn print_node(node: Node, depth: usize, config: &FormatConfig) -> String {
     match node {
         Node::Object { pairs } => 
         {
             let depth = depth + 1;
-            println!("object {}", depth);
-            let indent = " ".repeat(4 * depth);
-            let dedent = " ".repeat(4 * (depth - 1));
+            let (indent, dedent) = derive(depth, config);
+            let end = format!("{}{}{}", dedent, "}", if depth == 1 { "\n" } else { "" });
             let joiner = format!("{}{}", ",\n", indent);
-            let end_object = if depth == 1 { 
-
-                println!("happens? {}", depth);
-                format!("{}{}\n", dedent, "}")
-            } else {
-                format!("{}{}", dedent, "}")
-            };
 
             format!(
                 "{}\n{}{}\n{}", 
                 "{",
                 indent,
                 pairs.into_iter().map(|ref item| print_node((**item).clone(), depth, config)).collect::<Vec::<String>>().join(&joiner),
-                &end_object
+                &end
             )
         },
         Node::Array { items } => {
             let depth = depth + 1;
-            println!("array {}", depth);
-            let indent = " ".repeat(4 * depth);
-            let dedent = " ".repeat(4 * (depth - 1));
+            let (indent, dedent) = derive(depth, config);
             let joiner = format!("{}{}", ",\n", indent);
             format!(
                 "[\n{}{}\n{}]", 
