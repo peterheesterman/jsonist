@@ -25,37 +25,34 @@ fn derive(depth: usize, config: &FormatConfig) -> (String, String) {
                 DelimiterCount::Two => 2,
                 DelimiterCount::Four => 4,
             };
-            (" ".repeat(number * depth), " ".repeat(number * (depth - 1)))
+            (" ".repeat(number * (depth + 1)), " ".repeat(number * depth))
         },
-        Delimiter::Tabs => ("\t".repeat(depth), "\t".repeat(depth - 1))
+        Delimiter::Tabs => ("\t".repeat(depth + 1), "\t".repeat(depth))
     }
 }
 
 fn print_node(node: Node, depth: usize, config: &FormatConfig) -> String {
     match node {
-        Node::Object { pairs } => 
-        {
-            let depth = depth + 1;
+        Node::Object { pairs } => {
             let (indent, dedent) = derive(depth, config);
-            let end = format!("{}{}{}", dedent, "}", if depth == 1 { "\n" } else { "" });
+            let end = format!("{}{}{}", dedent, "}", if depth == 0 { "\n" } else { "" });
             let joiner = format!("{}{}", ",\n", indent);
 
             format!(
                 "{}\n{}{}\n{}", 
                 "{",
                 indent,
-                pairs.into_iter().map(|ref item| print_node((**item).clone(), depth, config)).collect::<Vec::<String>>().join(&joiner),
+                pairs.into_iter().map(|ref item| print_node((**item).clone(), depth + 1, config)).collect::<Vec::<String>>().join(&joiner),
                 &end
             )
         },
         Node::Array { items } => {
-            let depth = depth + 1;
             let (indent, dedent) = derive(depth, config);
             let joiner = format!("{}{}", ",\n", indent);
             format!(
                 "[\n{}{}\n{}]", 
                 indent,
-                items.into_iter().map(|ref item| print_node((**item).clone(), depth, config)).collect::<Vec::<String>>().join(&joiner),
+                items.into_iter().map(|ref item| print_node((**item).clone(), depth + 1, config)).collect::<Vec::<String>>().join(&joiner),
                 dedent
             )
         },
