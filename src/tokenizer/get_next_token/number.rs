@@ -26,7 +26,6 @@ pub fn process_number_literal(
                     return check_end_for_e(token_position, literal)
                 }
                 value @ _ if value.is_ascii_digit() || *value == '.' || *value == 'e' => {
-                    
                     // No second dots
                     if *value == '.' {
                         if has_seen_dot {
@@ -54,7 +53,7 @@ pub fn process_number_literal(
                 }
             }
         } else {
-            return check_end_for_e(token_position, literal)
+            return check_end_for_e(token_position, literal);
         };
 
         indexed_characters = indexed_characters.progress();

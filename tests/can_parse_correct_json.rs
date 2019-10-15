@@ -2,7 +2,7 @@ extern crate jsonist;
 
 use std::fs;
 
-use jsonist:: { format, FormatConfig, Delimiter, DelimiterCount, FormatterError };
+use jsonist::{format, Delimiter, DelimiterCount, FormatConfig, FormatterError};
 
 #[test]
 fn integration_can_use_errors_in_public_interface() {
@@ -11,18 +11,17 @@ fn integration_can_use_errors_in_public_interface() {
             "name": "Peter",
             "name": 2,
         }
-    "#.to_owned();
+    "#
+    .to_owned();
 
     match format(json, None) {
         Ok(value) => assert_eq!(value, String::from("")),
-        Err(e) => { 
-            match e {
-                FormatterError::DuplicateKeyEntry(key) => {
-                    assert_eq!(key, "name");
-                },
-                _ => panic!("Oh no")
+        Err(e) => match e {
+            FormatterError::DuplicateKeyEntry(key) => {
+                assert_eq!(key, "name");
             }
-        }
+            _ => panic!("Oh no"),
+        },
     }
 }
 
@@ -39,7 +38,8 @@ fn integration_test_max_depth_one() {
             },
             "winner": true
         }
-    "#.to_owned();
+    "#
+    .to_owned();
 
     let expected_out_file_path = "./tests/output/con_parse_correct_json.json";
 
@@ -47,7 +47,7 @@ fn integration_test_max_depth_one() {
 
     match format(json, None) {
         Ok(value) => assert_eq!(value, expected_contents),
-        Err(e) => panic!("{}", e)
+        Err(e) => panic!("{}", e),
     }
 }
 
@@ -64,7 +64,7 @@ fn integration_test_more_depth() {
 
     match format(json, None) {
         Ok(value) => assert_eq!(value, expected_contents),
-        Err(e) => panic!("{}", e)
+        Err(e) => panic!("{}", e),
     }
 }
 
@@ -79,7 +79,7 @@ fn integration_test_more_depth_two_spaces() {
 
     match format(json, Some(config)) {
         Ok(value) => assert_eq!(value, expected_contents),
-        Err(e) => panic!("{}", e)
+        Err(e) => panic!("{}", e),
     }
 }
 
@@ -94,7 +94,6 @@ fn integration_test_more_depth_tabs() {
 
     match format(json, Some(config)) {
         Ok(value) => assert_eq!(value, expected_contents),
-        Err(e) => panic!("{}", e)
+        Err(e) => panic!("{}", e),
     }
 }
-

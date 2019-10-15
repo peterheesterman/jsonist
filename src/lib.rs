@@ -1,9 +1,9 @@
 pub mod formatter;
-pub use formatter::errors::{ FormatterError };
-pub use formatter::{ FormatConfig, Delimiter, DelimiterCount };
+pub use formatter::errors::FormatterError;
+pub use formatter::{Delimiter, DelimiterCount, FormatConfig};
 
-mod tokenizer;
 mod parser;
+mod tokenizer;
 
 pub fn format(input: String, config: Option<FormatConfig>) -> Result<String, FormatterError> {
     let tokens = tokenizer::tokenize(input.as_str())?;
@@ -13,4 +13,3 @@ pub fn format(input: String, config: Option<FormatConfig>) -> Result<String, For
         Some(config) => Ok(formatter::stringify_with_config(ast, &config)),
     }
 }
-

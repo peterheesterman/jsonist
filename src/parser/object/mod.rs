@@ -1,10 +1,9 @@
-
 use crate::formatter::errors::FormatterError;
 use crate::tokenizer::Token;
 
-use super::Node;
-use super::JumpNode;
 use super::parse_node;
+use super::JumpNode;
+use super::Node;
 
 mod literal;
 use literal::parse_literal;
@@ -20,11 +19,11 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                 Token::CloseBrace(_) => {
                     let movement_from_braces = 2;
                     let net_movement = (jump - position) + movement_from_braces;
-                    return Ok((net_movement, Node::Object { pairs }))
-                },
+                    return Ok((net_movement, Node::Object { pairs }));
+                }
                 Token::Comma(_) => {
                     jump = jump + 1;
-                },
+                }
                 _ => {
                     let (movement, key) = parse_literal(&tokens, jump)?;
                     jump = jump + movement;
@@ -34,8 +33,8 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                         match token {
                             Token::Colon(_) => {
                                 jump = jump + 1;
-                            },
-                            _ => return Err(FormatterError::ExpectedColonInKeyValuePair())
+                            }
+                            _ => return Err(FormatterError::ExpectedColonInKeyValuePair()),
                         }
                     }
 
@@ -45,17 +44,19 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
                     // Check for duplicate keys
                     if let Node::Literal { literal } = &key {
                         if keys.contains(literal) {
-                            return Err(FormatterError::DuplicateKeyEntry(literal.to_string()))
+                            return Err(FormatterError::DuplicateKeyEntry(literal.to_string()));
                         }
-                        keys.push(literal.to_string()) 
+                        keys.push(literal.to_string())
                     }
 
-
-                    pairs.push(Box::new(Node::Pair { key: Box::new(key), value: Box::new(value) }))
+                    pairs.push(Box::new(Node::Pair {
+                        key: Box::new(key),
+                        value: Box::new(value),
+                    }))
                 }
             }
         } else {
-            return Err(FormatterError::ExpectedMoreCharacters(99999999))
+            return Err(FormatterError::ExpectedMoreCharacters(99999999));
         }
     }
 }
@@ -71,7 +72,7 @@ mod tests {
         let close_brace = Token::CloseBrace(1);
         let node = Node::Object { pairs: vec![] };
 
-        match parse_object(&vec![ open_brace, close_brace ], 1) {
+        match parse_object(&vec![open_brace, close_brace], 1) {
             Ok((_, result)) => assert_eq!(result, node),
             Err(e) => panic!("{}", e),
         }
@@ -87,20 +88,16 @@ mod tests {
         let true_token = Token::True(12, "true");
         let close_brace = Token::CloseBrace(17);
 
-        let tokens = vec![
-            open_brace,
-            win,
-            colon,
-            true_token,
-            close_brace,
-        ];
+        let tokens = vec![open_brace, win, colon, true_token, close_brace];
 
-        let node = Node::Object { pairs: vec![
-            Box::new(Node::Pair {
-                key: Box::new(Node::Literal { literal: String::from("w in") }),
-                value: Box::new(Node::True)
-            })
-        ]};
+        let node = Node::Object {
+            pairs: vec![Box::new(Node::Pair {
+                key: Box::new(Node::Literal {
+                    literal: String::from("w in"),
+                }),
+                value: Box::new(Node::True),
+            })],
+        };
 
         match parse_object(&tokens, 1) {
             Ok((_, result)) => assert_eq!(result, node),
@@ -119,20 +116,16 @@ mod tests {
         let true_token = Token::True(12, "true");
         let close_brace = Token::CloseBrace(17);
 
-        let tokens = vec![
-            open_brace,
-            win,
-            bad_char,
-            true_token,
-            close_brace,
-        ];
+        let tokens = vec![open_brace, win, bad_char, true_token, close_brace];
 
-        let node = Node::Object { pairs: vec![
-            Box::new(Node::Pair {
-                key: Box::new(Node::Literal { literal: String::from("w in") }),
-                value: Box::new(Node::True)
-            })
-        ]};
+        let node = Node::Object {
+            pairs: vec![Box::new(Node::Pair {
+                key: Box::new(Node::Literal {
+                    literal: String::from("w in"),
+                }),
+                value: Box::new(Node::True),
+            })],
+        };
 
         match parse_object(&tokens, 1) {
             Ok((_, result)) => assert_eq!(result, node),
@@ -151,20 +144,16 @@ mod tests {
         let true_token = Token::True(12, "true");
         let close_brace = Token::CloseBrace(17);
 
-        let tokens = vec![
-            open_brace,
-            false_token,
-            colon,
-            true_token,
-            close_brace,
-        ];
+        let tokens = vec![open_brace, false_token, colon, true_token, close_brace];
 
-        let node = Node::Object { pairs: vec![
-            Box::new(Node::Pair {
-                key: Box::new(Node::Literal { literal: String::from("w in") }),
-                value: Box::new(Node::True)
-            })
-        ]};
+        let node = Node::Object {
+            pairs: vec![Box::new(Node::Pair {
+                key: Box::new(Node::Literal {
+                    literal: String::from("w in"),
+                }),
+                value: Box::new(Node::True),
+            })],
+        };
 
         match parse_object(&tokens, 1) {
             Ok((_, result)) => assert_eq!(result, node),
@@ -196,16 +185,22 @@ mod tests {
             close_brace,
         ];
 
-        let node = Node::Object { pairs: vec![
-            Box::new(Node::Pair {
-                key: Box::new(Node::Literal { literal: String::from("w in") }),
-                value: Box::new(Node::True)
-            }),
-            Box::new(Node::Pair {
-                key: Box::new(Node::Literal { literal: String::from("wow") }),
-                value: Box::new(Node::False)
-            })
-        ]};
+        let node = Node::Object {
+            pairs: vec![
+                Box::new(Node::Pair {
+                    key: Box::new(Node::Literal {
+                        literal: String::from("w in"),
+                    }),
+                    value: Box::new(Node::True),
+                }),
+                Box::new(Node::Pair {
+                    key: Box::new(Node::Literal {
+                        literal: String::from("wow"),
+                    }),
+                    value: Box::new(Node::False),
+                }),
+            ],
+        };
 
         match parse_object(&tokens, 1) {
             Ok((_, result)) => assert_eq!(result, node),
@@ -238,16 +233,22 @@ mod tests {
             close_brace,
         ];
 
-        let node = Node::Object { pairs: vec![
-            Box::new(Node::Pair {
-                key: Box::new(Node::Literal { literal: String::from("w in") }),
-                value: Box::new(Node::True)
-            }),
-            Box::new(Node::Pair {
-                key: Box::new(Node::Literal { literal: String::from("w in") }),
-                value: Box::new(Node::True)
-            })
-        ]};
+        let node = Node::Object {
+            pairs: vec![
+                Box::new(Node::Pair {
+                    key: Box::new(Node::Literal {
+                        literal: String::from("w in"),
+                    }),
+                    value: Box::new(Node::True),
+                }),
+                Box::new(Node::Pair {
+                    key: Box::new(Node::Literal {
+                        literal: String::from("w in"),
+                    }),
+                    value: Box::new(Node::True),
+                }),
+            ],
+        };
 
         match parse_object(&tokens, 1) {
             Ok((_, result)) => assert_eq!(result, node),
@@ -255,4 +256,3 @@ mod tests {
         }
     }
 }
-

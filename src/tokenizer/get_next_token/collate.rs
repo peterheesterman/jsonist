@@ -2,12 +2,6 @@ use super::super::indexed_characters::IndexedCharacters;
 use super::super::Token;
 use crate::formatter::errors::FormatterError;
 
-enum ComplexToken {
-    False,
-    True,
-    Null,
-}
-
 pub fn process_expectation(
     literal: &'static str,
     token: Token,

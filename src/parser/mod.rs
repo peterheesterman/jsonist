@@ -25,7 +25,9 @@ pub enum Node {
 }
 
 type JumpNode = (usize, Node);
-fn wrap_in_jump (node: Node) -> JumpNode { (1, node) }
+fn wrap_in_jump(node: Node) -> JumpNode {
+    (1, node)
+}
 
 #[derive(Debug, PartialEq)]
 pub struct AST {
@@ -53,9 +55,13 @@ fn parse_node(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Formatte
             Token::True(_, _) => Ok(wrap_in_jump(Node::True)),
             Token::False(_, _) => Ok(wrap_in_jump(Node::False)),
             Token::Null(_, _) => Ok(wrap_in_jump(Node::Null)),
-            Token::StringLiteral(_, literal) => Ok(wrap_in_jump(Node::Literal { literal: literal.to_string() })),
-            Token::Number(_, literal) => Ok(wrap_in_jump(Node::Number { value:  literal.parse::<f64>().unwrap() })),
-            _ => return Err(FormatterError::ExpectedMoreCharacters(11111111))
+            Token::StringLiteral(_, literal) => Ok(wrap_in_jump(Node::Literal {
+                literal: literal.to_string(),
+            })),
+            Token::Number(_, literal) => Ok(wrap_in_jump(Node::Number {
+                value: literal.parse::<f64>().unwrap(),
+            })),
+            _ => return Err(FormatterError::ExpectedMoreCharacters(11111111)),
         }
     } else {
         Err(FormatterError::ExpectedMoreTokens())
@@ -71,7 +77,7 @@ mod tests {
         let true_token = Token::True(0, "true");
         let ast = AST { root: Node::True };
 
-        match parse(vec![ true_token ]) {
+        match parse(vec![true_token]) {
             Ok(result) => assert_eq!(result, ast),
             Err(e) => panic!("{}", e),
         }
@@ -82,7 +88,7 @@ mod tests {
         let false_token = Token::False(0, "false");
         let ast = AST { root: Node::False };
 
-        match parse(vec![ false_token ]) {
+        match parse(vec![false_token]) {
             Ok(result) => assert_eq!(result, ast),
             Err(e) => panic!("{}", e),
         }
@@ -93,7 +99,7 @@ mod tests {
         let null = Token::Null(0, "null");
         let ast = AST { root: Node::Null };
 
-        match parse(vec![ null ]) {
+        match parse(vec![null]) {
             Ok(result) => assert_eq!(result, ast),
             Err(e) => panic!("{}", e),
         }
@@ -103,9 +109,11 @@ mod tests {
     fn string() {
         let input = String::from("test mc test");
         let string = Token::StringLiteral(0, input.to_string());
-        let ast = AST { root: Node::Literal { literal: input } };
+        let ast = AST {
+            root: Node::Literal { literal: input },
+        };
 
-        match parse(vec![ string ]) {
+        match parse(vec![string]) {
             Ok(result) => assert_eq!(result, ast),
             Err(e) => panic!("{}", e),
         }
@@ -114,9 +122,11 @@ mod tests {
     #[test]
     fn number() {
         let number = Token::Number(0, String::from("34.4e3"));
-        let ast = AST { root: Node::Number { value: 34400.0 } };
+        let ast = AST {
+            root: Node::Number { value: 34400.0 },
+        };
 
-        match parse(vec![ number ]) {
+        match parse(vec![number]) {
             Ok(result) => assert_eq!(result, ast),
             Err(e) => panic!("{}", e),
         }
@@ -160,11 +170,15 @@ mod tests {
             whitespace7,
         ];
 
-        let ast = AST { root: Node::Array { items: vec![
-            Box::new(Node::False),
-            Box::new(Node::Number { value: 23.23_f64}),
-            Box::new(Node::True)
-        ] } };
+        let ast = AST {
+            root: Node::Array {
+                items: vec![
+                    Box::new(Node::False),
+                    Box::new(Node::Number { value: 23.23_f64 }),
+                    Box::new(Node::True),
+                ],
+            },
+        };
 
         match parse(tokens) {
             Ok(result) => assert_eq!(result, ast),

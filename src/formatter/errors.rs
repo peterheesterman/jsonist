@@ -22,7 +22,7 @@ pub enum FormatterError {
     ExpectedMoreTokens(),
     ExpectedColonInKeyValuePair(),
     ExpectedStringLiteral(usize),
-    DuplicateKeyEntry(String)
+    DuplicateKeyEntry(String),
 }
 
 impl fmt::Display for FormatterError {
@@ -46,7 +46,7 @@ impl fmt::Display for FormatterError {
                 wrong_character, expected_character, attempted_token_literal
             ),
 
-            // Number 
+            // Number
             InvalidNumberCharacter(position, character) => write!(
                 f,
                 "Character ({}) at postition ({}) is not valid in a number.",
@@ -62,20 +62,19 @@ impl fmt::Display for FormatterError {
                 "Found and extra e at postition ({}) which is not valid in a number.",
                 position
             ),
-            NumberLiteralEndingInE() => write!(
-                f,
-                "A number literal can not end with an 'e' character."
-            ),
+            NumberLiteralEndingInE() => {
+                write!(f, "A number literal can not end with an 'e' character.")
+            }
 
             // Parser
-            ExpectedMoreTokens() => write!( f, "Ran out of tokens while parsing."),
-            ExpectedColonInKeyValuePair() => write!( f, "Key value pairs must be delimited by colons (:)."),
-            ExpectedStringLiteral(position) => write!(
-                f,
-                "Expected string literal at position ({}).",
-                position
-            ),
-            DuplicateKeyEntry(literal) => write!( f, "Duplicate key ('{}') entry.", literal),
+            ExpectedMoreTokens() => write!(f, "Ran out of tokens while parsing."),
+            ExpectedColonInKeyValuePair() => {
+                write!(f, "Key value pairs must be delimited by colons (:).")
+            }
+            ExpectedStringLiteral(position) => {
+                write!(f, "Expected string literal at position ({}).", position)
+            }
+            DuplicateKeyEntry(literal) => write!(f, "Duplicate key ('{}') entry.", literal),
         }
     }
 }
