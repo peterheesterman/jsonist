@@ -5,9 +5,9 @@ A JSON formatter
 
 ### How does it work?
 
-Jsonist tokenizes the input string and then builds an Abstract Syntax Tree (AST).
+Jsonist tokenizes the input string you give it and then builds an Abstract Syntax Tree (AST).
 
-It then takes the AST and produces a String of formatted JSON from the AST and optional configuration variables.
+It then takes the AST and produces a String of formatted JSON from the AST and the optional configuration parameter.
 
 
 ### Example Usage
@@ -54,11 +54,11 @@ fn example() {
 ### Error types
 (in case you want to handle, ignore or print them out)
 ``` 
-    // Tokeniser
+    // General Tokeniser
     ExpectedMoreCharacters, InvalidTokenStartCharacter, WrongCharacter
 
-      // Tokenising Numbers 
-      InvalidNumberCharacter, ExtraDotInNumber, ExtraEInNumber, NumberLiteralEndingInE,
+    // Tokenising Numbers 
+    InvalidNumberCharacter, ExtraDotInNumber, ExtraEInNumber, NumberLiteralEndingInE,
 
     // Parser
     ExpectedMoreTokens, ExpectedColonInKeyValuePair, ExpectedStringLiteral, DuplicateKeyEntry
