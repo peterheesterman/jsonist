@@ -63,7 +63,6 @@ pub fn parse_object(tokens: &Vec<Token>, position: usize) -> Result<JumpNode, Fo
 
 #[cfg(test)]
 mod tests {
-    use super::super::AST;
     use super::*;
 
     #[test]
