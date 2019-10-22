@@ -15,10 +15,10 @@ It then takes the AST and produces a String of formatted JSON from the AST and t
 Add to your `Cargo.toml`:
 
 ```
-   … Fill this in
+jsonist = '0.0.1'
 ```
 
-Then in your code:
+Then in your code you can use it like this:
 
 ```
 extern crate jsonist;
@@ -54,12 +54,12 @@ fn example() {
 ### Error types
 (in case you want to handle, ignore or print them out)
 ``` 
-    // General Tokeniser
-    ExpectedMoreCharacters, InvalidTokenStartCharacter, WrongCharacter
+  // General Tokeniser
+  ExpectedMoreCharacters, InvalidTokenStartCharacter, WrongCharacter
 
-    // Tokenising Numbers 
-    InvalidNumberCharacter, ExtraDotInNumber, ExtraEInNumber, NumberLiteralEndingInE,
+  // Tokenising Numbers 
+  InvalidNumberCharacter, ExtraDotInNumber, ExtraEInNumber, NumberLiteralEndingInE,
 
-    // Parser
-    ExpectedMoreTokens, ExpectedColonInKeyValuePair, ExpectedStringLiteral, DuplicateKeyEntry
+  // Parser
+  ExpectedMoreTokens, ExpectedColonInKeyValuePair, ExpectedStringLiteral, DuplicateKeyEntry
 ```
