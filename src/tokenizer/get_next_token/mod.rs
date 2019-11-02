@@ -36,7 +36,7 @@ pub fn get_next_token(indexed_characters: IndexedCharacters) -> Result<Token, Fo
         ' ' => WhiteSpace(position, ' '),
         '\n' => WhiteSpace(position, '\n'),
         '\t' => WhiteSpace(position, '\t'),
-        &literal @ _ if literal.is_ascii_digit() => process_number_literal(indexed_characters)?,
+        &literal @ _ if literal.is_ascii_digit() || literal == '-' => process_number_literal(indexed_characters)?,
         &literal @ _ => {
             return Err(FormatterError::InvalidTokenStartCharacter(
                 position, literal,
