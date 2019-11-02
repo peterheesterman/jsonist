@@ -15,7 +15,7 @@ It then takes the AST and produces a String of formatted JSON from the AST and t
 Add to your `Cargo.toml`:
 
 ```
-jsonist = '0.0.1'
+jsonist = '0.0.2'
 ```
 
 Then in your code you can use it like this:
