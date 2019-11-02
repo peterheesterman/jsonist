@@ -17,6 +17,7 @@ pub enum FormatterError {
     ExtraDotInNumber(usize),
     ExtraEInNumber(usize),
     NumberLiteralEndingInE(),
+    NumberCanNotHaveANegativeSignNotAtHead(),
 
     // Parser
     ExpectedMoreTokens(),
@@ -64,7 +65,11 @@ impl fmt::Display for FormatterError {
             ),
             NumberLiteralEndingInE() => {
                 write!(f, "A number literal can not end with an 'e' character.")
-            }
+            },
+            NumberCanNotHaveANegativeSignNotAtHead() => write!(
+                f,
+                "Number can not have a - at a position other than the start of string"
+            ),
 
             // Parser
             ExpectedMoreTokens() => write!(f, "Ran out of tokens while parsing."),
