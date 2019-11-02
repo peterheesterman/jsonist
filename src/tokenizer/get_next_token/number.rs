@@ -25,7 +25,11 @@ pub fn process_number_literal(
                 ',' | ']' | '}' | ' ' | '\n' | '\t' => {
                     return check_end_for_e(token_position, literal)
                 }
-                value @ _ if value.is_ascii_digit() || *value == '.' || *value == 'e' => {
+                value @ _ if value.is_ascii_digit() || *value == '.' || *value == 'e' || *value == '-' => {
+                    if *value == '-' && literal.len() != 0 {
+                        return Err(FormatterError::NumberCanNotHaveANegativeSignNotAtHead());
+                    }
+
                     // No second dots
                     if *value == '.' {
                         if has_seen_dot {
@@ -125,6 +129,31 @@ mod tests {
         let chars = json.chars().collect::<Vec<char>>();
         let indexed_characters = IndexedCharacters::new(&chars);
         let expectation = Token::Number(0, String::from(""));
+        match process_number_literal(indexed_characters) {
+            Ok(result) => assert_eq!(result, expectation),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    fn number_literals_should_handle_negative_numbers() {
+        let json = r#"-2.34"#;
+        let chars = json.chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+        let expectation = Token::Number(0, String::from("-2.34"));
+        match process_number_literal(indexed_characters) {
+            Ok(result) => assert_eq!(result, expectation),
+            Err(e) => panic!("{}", e),
+        }
+    }
+
+    #[test]
+    #[should_panic(expected = "Number can not have a - at a position other than the start of string")]
+    fn number_literals_no_negative_symbol_at_postitions_other_than_the_first() {
+        let json = r#"2-.34"#;
+        let chars = json.chars().collect::<Vec<char>>();
+        let indexed_characters = IndexedCharacters::new(&chars);
+        let expectation = Token::Number(0, String::from("-2.34"));
         match process_number_literal(indexed_characters) {
             Ok(result) => assert_eq!(result, expectation),
             Err(e) => panic!("{}", e),
